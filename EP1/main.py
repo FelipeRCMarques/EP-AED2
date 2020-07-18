@@ -8,15 +8,15 @@ def ler_dados():
 
     # retorna um pandas DataFrame com somente as colunas que eu quero
     return dados[
-        ['CO_DOM_X', 'CO_DOM_Y',
-        'CO_ESC_X','CO_ESC_Y',
-        'CO_TR1_X','CO_TR1_Y',
-        'CO_TR2_X','CO_TR2_Y',
-        'CO_O_X', 'CO_O_Y',
-        'CO_D_X', 'CO_D_Y',
-        'CO_T1_X', 'CO_T1_Y',
-        'CO_T2_X', 'CO_T2_Y',
-        'CO_T3_X', 'CO_T3_Y',
+        ['CO_DOM_X', 'CO_DOM_Y', 
+        'CO_ESC_X', 'CO_ESC_Y', 
+        'CO_TR1_X', 'CO_TR1_Y', 
+        'CO_TR2_X', 'CO_TR2_Y', 
+        'CO_O_X', 'CO_O_Y', 
+        'CO_D_X', 'CO_D_Y', 
+        'CO_T1_X', 'CO_T1_Y', 
+        'CO_T2_X', 'CO_T2_Y', 
+        'CO_T3_X', 'CO_T3_Y', 
         'ID_PESS']
     ]
 
@@ -71,31 +71,43 @@ def executar():
             if len(obj_local.getFrequentadores()) > max_freq:
                 max_freq = len(obj_local.getFrequentadores())
 
-    total_freq = []
-    i = 0
-    while i <= max_freq+1:
-        x = 0
-        total_freq.append(x)
+    # coloca 0 na posicao 1 ate max_freq do dicionario
+    total_freq = {}
+    for i in range(1, max_freq+1):
+        total_freq[i] = 0
 
-        i += 1
-
-
+    # coloca a quantidade de frequentadores em cada posicao do dicionario, ou seja, se tiver 10 pessoas que frequentam 5 lugares, total_freq[5] = 10
     for obj_local in objs_locais:
-        num_freq = len(obj_local.getFrequentadores())
-        total_freq[num_freq] += 1
+        key = len(obj_local.getFrequentadores())
+        total_freq[key] += 1
 
-    print(total_freq)
+    # retira a quantidade de lugares que nao tem nenhum frequentador
+    total_freq = {x: y for x, y in total_freq.items() if y != 0}
 
+    # define os eixos x e y
+    total_freq_x = total_freq.keys() # o numero de frequentadores
+    total_freq_y = total_freq.values() # os lugares
 
+    # cria o histograma, define os eixos x e y, coloca o nome do titulo e dos eixos
+    pyplot.figure(figsize=(25, 10))
+    pyplot.bar(x=[i for i in range(1, len(total_freq_x)+1)], height=total_freq_y, log=True, color="gray", edgecolor="white")
+    pyplot.xticks([i for i in range(1, len(total_freq_x)+1)], labels=total_freq_x, rotation='vertical')
+    pyplot.title("Histograma da relacao entre frequentadores e quantidade de lugares")
+    pyplot.xlabel("Numero de frequentadores")
+    pyplot.ylabel("Quantidade de lugares")
 
+    # salva o histograma na mesma pasta
+    pyplot.savefig("./histograma.png")
 
 if __name__ == "__main__":
+    print("Execucao iniciada, por favor aguarde...")
+
+    # define o tempo para comecar a executar
     tempo_para_inicio = time.time()
+
+    # le os dados e executa o metodo de tratamento desses
     dados = ler_dados()
-
     executar()
-    #print(dicio)
 
-
-    #executar()
+    # imprime o tempo de processamento, que e o tempo executado menos o tempo que levou para iniciar o programa
     print("Tempo de processamento: %s segundos" % (time.time() - tempo_para_inicio))
